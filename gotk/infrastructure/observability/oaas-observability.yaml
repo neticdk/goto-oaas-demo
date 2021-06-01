@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: oaas-observability
-      version: "1.1.22"
+      version: "1.1.23"
       sourceRef:
         kind: HelmRepository
         name: netic-observability
@@ -113,3 +113,14 @@ spec:
 
     otel-operator:
       enabled: false
+
+    promtail:
+      enabled: true
+      config:
+        lokiAddress: https://goto.netic.dk/loki/api/v1/push
+        snippets:
+          extraClientConfigs:
+            tls_config:
+              insecure_skip_verify: true
+            external_labels:
+              cluster: ${cluster_name}

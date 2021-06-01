@@ -1,0 +1,7 @@
+.terraform*
+current_state*
+id_rsa
+plan.out
+*.tfstate*
+*.auto.tfvars
+kube_config.yaml

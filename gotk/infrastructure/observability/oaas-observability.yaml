@@ -1,0 +1,115 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: netic-observability-system
+  labels:
+    name: netic-observability-system
+    netic.dk/monitoring: "true"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: oaas-observability
+  namespace: netic-observability-system
+spec:
+  chart:
+    spec:
+      chart: oaas-observability
+      version: "1.1.22"
+      sourceRef:
+        kind: HelmRepository
+        name: netic-observability
+        namespace: netic-gitops-system
+      interval: 2m
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
+
+  releaseName: oaas-observability
+  interval: 2m
+
+  values:
+    global:
+      networkPolicyEnabled: false
+    endpointController:
+      enabled: false
+
+    coreDns:
+      enabled: true
+
+    kubeEtcd:
+      enabled: true
+      serviceMonitor:
+        scheme: "http"
+
+    kubeControllerManager:
+      service:
+        port: 10252
+        targetPort: 10252
+      serviceMonitor:
+        https: false
+
+    kubeScheduler:
+      service:
+        port: 10251
+        targetPort: 10251
+      serviceMonitor:
+        https: false
+
+    prometheus-operator:
+      enabled: true
+      prometheusOperator:
+        tlsProxy:
+          enabled: false
+        admissionWebhooks:
+          enabled: false
+
+    alertmanager:
+      enabled: false
+
+    prometheus:
+      prometheusSpec:
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 768Mi
+        externalLabels:
+          cluster: ${cluster_name}
+          prometheus_cluster: ${cluster_name}/netic-oaas-prometheus
+        remoteWrite:
+        - url: https://goto.netic.dk/api/prom/push
+          tlsConfig:
+            insecureSkipVerify: true
+          queueConfig:
+            maxShards: 15
+        serviceMonitorNamespaceSelector:
+          matchLabels:
+            netic.dk/monitoring: "true"
+
+    prometheus-node-exporter:
+      resources:
+        limits:
+          cpu: 300m
+          memory: 50Mi
+        requests:
+          cpu: 10m
+          memory: 30Mi
+
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+
+    vector-agent:
+      enabled: false
+
+    grafana:
+      enabled: false
+
+    otel-operator:
+      enabled: false

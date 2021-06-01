@@ -119,7 +119,7 @@ spec:
       config:
         lokiAddress: https://goto.netic.dk/loki/api/v1/push
         snippets:
-          extraClientConfigs:
+          extraClientConfigs: |
             tls_config:
               insecure_skip_verify: true
             external_labels:

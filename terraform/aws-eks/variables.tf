@@ -36,8 +36,3 @@ variable "github_repo" {
   type    = string
   default = "goto-oaas-demo"
 }
-
-variable "github_url" {
-  type    = string
-  default = "git@github.com/neticdk/goto-oaas-demo.git//gotk/clusters/aws-eks/bootstrap"
-}

@@ -39,7 +39,7 @@ resource "tls_private_key" "github_key" {
 }
 
 resource "github_repository_deploy_key" "gotk" {
-  title      = "GitOps Toolkit deployment key"
+  title      = "GitOps Toolkit deployment key - aws-eks"
   repository = var.github_repo
   key        = tls_private_key.github_key.public_key_openssh
   read_only  = "true"

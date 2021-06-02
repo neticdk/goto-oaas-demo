@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: oaas-observability
-      version: "1.1.23"
+      version: "2.0.1"
       sourceRef:
         kind: HelmRepository
         name: netic-observability
@@ -44,16 +44,10 @@ spec:
         scheme: "http"
 
     kubeControllerManager:
-      service:
-        port: 10252
-        targetPort: 10252
       serviceMonitor:
         https: false
 
     kubeScheduler:
-      service:
-        port: 10251
-        targetPort: 10251
       serviceMonitor:
         https: false
 
@@ -124,3 +118,35 @@ spec:
               insecure_skip_verify: true
             external_labels:
               cluster: ${cluster_name}
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: netic-observability-system
+spec:
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+      jaeger:
+        protocols:
+          grpc:
+
+    processors:
+      batch:
+
+    exporters:
+      otlphttp:
+        endpoint: https://goto.netic.dk/otel/v1/traces
+        insecure: true
+      logging:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger]
+          processors: [batch]
+          exporters: [logging, otlphttp]

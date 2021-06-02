@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: netic-hotrod-app
+  labels:
+    name: netic-hotrod-app
+    netic.dk/monitoring: "true"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: netic-hotrod-app-namespace
+  namespace: netic-security-system
+spec:
+  chart:
+    spec:
+      chart: oaas-namespace
+      version: "2.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: netic-sccd
+        namespace: netic-gitops-system
+      interval: 2m
+
+  targetNamespace: netic-hotrod-app
+  releaseName: bootstrap-hotrod-app
+  interval: 2m
+
+  values:
+    createServiceAccount: true
+    networkPolicyEnabled: true
+    networkPolicies:
+      - name: contour-ingress
+        spec:
+          podSelector:
+            matchLabels:
+              netic.dk/network-ingress: contour
+          policyTypes:
+            - Ingress
+          ingress:
+            - from:  # Contour ingress controller
+              - namespaceSelector:
+                  matchLabels:
+                    name: netic-ingress-system
+              ports:
+                - protocol: TCP
+                  port: http
+      - name: default-egress
+        spec:
+          podSelector: {}
+          policyTypes:
+            - Egress
+          egress:
+            - ports:
+                - protocol: TCP
+                  port: 53
+                - protocol: UDP
+                  port: 53
+                - protocol: TCP
+                  port: 443
+    resourceQuota:
+      enabled: false
+    git:
+      interval: 1m
+      url: ssh://git@github.com/neticdk/goto-oaas-demo.git
+      ref:
+        branch: devops-team
+      secretRef:
+        name: flux-system
+        namespace: netic-gitops-system
+    kustomize:
+      interval: 1m
+      path: azure-aks/hotrod
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: netic-hotrod-app
+spec:
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+      jaeger:
+        protocols:
+          grpc:
+          thrift_compact:
+
+    processors:
+      batch:
+
+    exporters:
+      otlphttp:
+        endpoint: https://goto.netic.dk/otel
+        insecure_skip_verify: true
+      logging:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger]
+          processors: [batch]
+          exporters: [logging, otlphttp]

@@ -20,6 +20,15 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
+  name: netic-sccd
+  namespace: netic-gitops-system
+spec:
+  url: https://neticdk.github.io/k8s-oaas-sccd
+  interval: 5m
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
   name: bitnami
   namespace: netic-gitops-system
 spec:
@@ -78,6 +87,22 @@ metadata:
 spec:
   interval: 5m0s
   path: ./gotk/clusters/azure-aks/releases
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: none
+  dependsOn:
+    - name: observability
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: namespaces
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/clusters/azure-aks/namespaces
   prune: true
   sourceRef:
     kind: GitRepository

@@ -82,6 +82,8 @@ spec:
     kustomize:
       interval: 1m
       path: azure-aks/hotrod
+    helm-operator:
+      enabled: false
 ---
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector

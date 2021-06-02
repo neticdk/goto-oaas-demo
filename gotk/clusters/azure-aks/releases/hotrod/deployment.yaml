@@ -26,7 +26,9 @@ spec:
           image: jaegertracing/example-hotrod:latest
           imagePullPolicy: Always
           args:
-            - -m prometheus
+            - all
+            - -m
+            - prometheus
           ports:
             - name: http
               containerPort: 8080

@@ -29,6 +29,11 @@ spec:
             - all
             - -m
             - prometheus
+          env:
+            - name: JAEGER_AGENT_HOST
+              value: localhost
+            - name: JAEGER_AGENT_PORT
+              value: "6831"
           ports:
             - name: http
               containerPort: 8080

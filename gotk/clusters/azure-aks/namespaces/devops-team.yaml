@@ -7,6 +7,17 @@ metadata:
     name: netic-hotrod-app
     netic.dk/monitoring: "true"
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: devops-team-key
+  namespace: netic-hotrod-app
+type: Opaque
+data:
+  identity: LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNCVUVHSjVDT2Y4RFBpQlorWHZRTENZVWRRMDZtMy96OGg0QXBEaDBla2RBQUFBQUpEc0VDOVk3QkF2CldBQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQlVFR0o1Q09mOERQaUJaK1h2UUxDWVVkUTA2bTMvejhoNEFwRGgwZWtkQUEKQUFBRUQ1Mkt4T2djTXBGZHJOcTEwRklKc0hmYzB5eVBkamZOc0x0Q1BkQWc5dlZGUVFZbmtJNS93TStJRm41ZTlBc0poUgoxRFRxYmYvUHlIZ0NrT0hSNlIwQUFBQUFESFJoYkVCdVpYUnBZeTVrYXdFPQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K
+  identity.pub: c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZRUVlua0k1L3dNK0lGbjVlOUFzSmhSMURUcWJmL1B5SGdDa09IUjZSMEEgdGFsQG5ldGljLmRrCg==
+  known_hosts: Z2l0aHViLmNvbSBzc2gtcnNhIEFBQUFCM056YUMxeWMyRUFBQUFCSXdBQUFRRUFxMkE3aFJHbWRubTl0VURiTzlJRFN3Qks2VGJRYStQWFlQQ1B5NnJiVHJUdHc3UEhrY2NLcnBwMHlWaHA1SGRFSWNLcjZwTGxWREJmT0xYOVFVc3lDT1Ywd3pmaklKTmxHRVlzZGxMSml6SGhibjJtVWp2U0FIUXFaRVRZUDgxZUZ6TFFOblBIdDRFVlZVaDdWZkRFU1U4NEtlem1ENVFsV3BYTG12VTMxL3lNZitTZTh4aEhUdktTQ1pJRkltV3dvRzZtYlVvV2Y5bnpwSW9hU2pCK3dlcXFVVW1wYWFhc1hWYWw3MkorVVgyQisyUlBXM1JjVDBlT3pRZ3FsSkwzUktyVEp2ZHNqRTNKRUF2R3EzbEdIU1pYeTI4RzNza3VhMlNtVmkvdzR5Q0U2Z2JPRHFuVFdsZzcrd0M2MDR5ZEdYQThWSmlTNWFwNDNKWGlVRkZBYVE9PQo=
+---
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
@@ -67,8 +78,7 @@ spec:
       ref:
         branch: devops-team
       secretRef:
-        name: flux-system
-        namespace: netic-gitops-system
+        name: devops-team-key
     kustomize:
       interval: 1m
       path: azure-aks/hotrod

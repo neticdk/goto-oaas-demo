@@ -1,0 +1,62 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: netic-observability
+  namespace: netic-gitops-system
+spec:
+  url: https://neticdk.github.io/k8s-oaas-observability
+  interval: 5m
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: netic-gitops-system
+spec:
+  url: https://charts.jetstack.io
+  interval: 5m
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: flux-system
+  namespace: netic-gitops-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  secretRef:
+    name: flux-system
+  url: ssh://git@github.com/neticdk/goto-oaas-demo.git
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: flux-system
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/clusters/netic-rke2/bootstrap
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: none
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: observability
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/infrastructure/observability
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: none
+  postBuild:
+    substitute:
+      cluster_name: "netic-rke2"

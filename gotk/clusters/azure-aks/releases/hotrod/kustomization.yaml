@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
 - deployment.yaml
 - ns.yaml
+- otel.yaml
 - service.yaml

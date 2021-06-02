@@ -23,6 +23,7 @@ spec:
       otlphttp:
         endpoint: https://goto.netic.dk/otel/v1/traces
         insecure: true
+        insecure_skip_verify: true
       logging:
 
     service:

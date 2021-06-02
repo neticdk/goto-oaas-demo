@@ -118,35 +118,3 @@ spec:
               insecure_skip_verify: true
             external_labels:
               cluster: ${cluster_name}
----
-apiVersion: opentelemetry.io/v1alpha1
-kind: OpenTelemetryCollector
-metadata:
-  name: otel-collector
-  namespace: netic-observability-system
-spec:
-  mode: sidecar
-  config: |
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-      jaeger:
-        protocols:
-          grpc:
-
-    processors:
-      batch:
-
-    exporters:
-      otlphttp:
-        endpoint: https://goto.netic.dk/otel/v1/traces
-        insecure: true
-      logging:
-
-    service:
-      pipelines:
-        traces:
-          receivers: [otlp, jaeger]
-          processors: [batch]
-          exporters: [logging, otlphttp]

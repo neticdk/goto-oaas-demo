@@ -25,29 +25,11 @@ spec:
         - name: hotrod
           image: jaegertracing/example-hotrod:latest
           imagePullPolicy: Always
+          args:
+            - -m prometheus
           ports:
             - name: http
               containerPort: 8080
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 20
-            successThreshold: 1
-            timeoutSeconds: 1
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 20
-            successThreshold: 1
-            timeoutSeconds: 1
           securityContext:
             allowPrivilegeEscalation: false
             capabilities:

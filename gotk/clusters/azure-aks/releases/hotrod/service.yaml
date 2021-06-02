@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jytte-service
-  namespace: horsezilla-online-team-a-app
+  name: hotrod
+  namespace: netic-hotrod-app
   labels:
     app.kubernetes.io/name: hotrod
     app.kubernetes.io/instance: hotrod

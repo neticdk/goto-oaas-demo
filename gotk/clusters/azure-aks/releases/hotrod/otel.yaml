@@ -14,6 +14,7 @@ spec:
       jaeger:
         protocols:
           grpc:
+          thrift_compact:
 
     processors:
       batch:

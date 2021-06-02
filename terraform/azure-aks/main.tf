@@ -39,6 +39,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 }
 
+resource "local_file" "kubeconfig" {
+  filename          = "kube_config.yaml"
+  sensitive_content = azurerm_kubernetes_cluster.aks.kube_config_raw
+  file_permission   = "0600"
+}
+
 resource "kubernetes_namespace" "gitops" {
   metadata {
     labels = {

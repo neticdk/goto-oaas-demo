@@ -21,7 +21,7 @@ spec:
 
     exporters:
       otlphttp:
-        endpoint: https://goto.netic.dk/otel/v1/traces
+        endpoint: https://goto.netic.dk/otel
         insecure_skip_verify: true
       logging:
 

@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app.kubernetes.io/name: hotrod
+    app.kubernetes.io/instance: hotrod
+    netic.dk/monitoring: "true"
+  name: hotrod
+  namespace: netic-hotrod-app
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+  namespaceSelector:
+    matchNames:
+      - netic-hotrod-app
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hotrod
+      app.kubernetes.io/instance: hotrod

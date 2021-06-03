@@ -70,6 +70,16 @@ spec:
                   port: 53
                 - protocol: TCP
                   port: 443
+    limitRange:
+      spec:
+        limits:
+          - default:
+              cpu: 100m
+              memory: 128Mi
+            defaultRequest:
+              cpu: 100m
+              memory: 128Mi
+            type: Container
     resourceQuota:
       spec:
         hard:

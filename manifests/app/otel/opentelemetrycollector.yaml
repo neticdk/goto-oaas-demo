@@ -1,0 +1,37 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: default
+spec:
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+      jaeger:
+        protocols:
+          grpc:
+          thrift_compact:
+
+    processors:
+      batch:
+      resource:
+        attributes:
+        - key: cluster
+          value: "azure-aks"
+          action: upsert
+
+    exporters:
+      otlphttp:
+        endpoint: https://goto.netic.dk/otel
+        insecure_skip_verify: true
+      logging:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger]
+          processors: [batch,resource]
+          exporters: [logging, otlphttp]

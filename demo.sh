@@ -21,9 +21,19 @@ function observable() {
 }
 
 function namespace() {
-  echo Making application namespace for devops team
+  echo Making application namespace for devops team and removing app deployment
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml delete -k manifests/app/observable
   cp manifests/cluster/sync_full.yaml gotk/clusters/azure-aks/bootstrap/sync.yaml
   commit_and_push "Configure demo cluster with application namespace"
+}
+
+function deploy_basic() {
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/basic
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/otel
+}
+
+function deploy_observable() {
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/observable
 }
 
 while [[ $# -gt 0 ]]; do
@@ -41,6 +51,14 @@ while [[ $# -gt 0 ]]; do
     namespace)
     shift
     namespace
+    ;;
+    app_basic)
+    shift
+    deploy_basic
+    ;;
+    app_observable)
+    shift
+    deploy_observable
     ;;
     *)
     echo Unknown argument: $key

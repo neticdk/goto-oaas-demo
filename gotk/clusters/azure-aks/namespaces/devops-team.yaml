@@ -71,7 +71,14 @@ spec:
                 - protocol: TCP
                   port: 443
     resourceQuota:
-      enabled: false
+      spec:
+        hard:
+          requests.cpu: "2"
+          requests.memory: "2Gi"
+          requests.storage: "0Gi"
+          limits.cpu: "2"
+          limits.memory: "2Gi"
+          persistentvolumeclaims: "0"
     git:
       interval: 1m
       url: ssh://git@github.com/neticdk/goto-oaas-demo.git

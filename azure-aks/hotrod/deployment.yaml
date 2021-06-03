@@ -51,6 +51,8 @@ spec:
             runAsNonRoot: true
           resources:
             limits:
-              memory: 512Mi
+              cpu: 100m
+              memory: 128Mi
             requests:
-              memory: 512Mi
+              cpu: 50m
+              memory: 64Mi

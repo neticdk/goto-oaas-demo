@@ -109,6 +109,11 @@ spec:
 
     processors:
       batch:
+      resource:
+        attributes:
+        - key: cluster
+          value: "azure-aks"
+          action: upsert
 
     exporters:
       otlphttp:
@@ -120,5 +125,5 @@ spec:
       pipelines:
         traces:
           receivers: [otlp, jaeger]
-          processors: [batch]
+          processors: [batch,resource]
           exporters: [logging, otlphttp]

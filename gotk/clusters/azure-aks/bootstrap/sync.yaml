@@ -54,7 +54,7 @@ metadata:
   name: flux-system
   namespace: netic-gitops-system
 spec:
-  interval: 5m0s
+  interval: 2m0s
   path: ./gotk/clusters/azure-aks/bootstrap
   prune: true
   sourceRef:
@@ -74,6 +74,15 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: oaas-observability-prometheus-operator
+      namespace: netic-observability-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: oaas-observability-otel-operator-ctrl-mgr
+      namespace: netic-observability-system
   validation: none
   postBuild:
     substitute:

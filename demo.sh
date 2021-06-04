@@ -28,12 +28,20 @@ function namespace() {
 }
 
 function deploy_basic() {
+  echo Deploying hotrod without observability
   kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/basic
-  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/otel
 }
 
 function deploy_observable() {
+  echo Deploying hotrod with observability
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/otel
+  sleep 5
   kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/observable
+}
+
+function remove_app() {
+  echo Removing hotrod deployment
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml delete -k manifests/app/observable
 }
 
 while [[ $# -gt 0 ]]; do
@@ -59,6 +67,10 @@ while [[ $# -gt 0 ]]; do
     app_observable)
     shift
     deploy_observable
+    ;;
+    app_remove)
+    shift
+    remove_app
     ;;
     *)
     echo Unknown argument: $key

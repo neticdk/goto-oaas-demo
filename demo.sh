@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Script to execute different demo steps
+script_dir=$(dirname $0)
+pushd $script_dir
 
 function commit_and_push() {
   git add gotk/clusters/azure-aks/bootstrap/sync.yaml
@@ -78,3 +80,5 @@ while [[ $# -gt 0 ]]; do
     ;;
   esac
 done
+
+popd

@@ -10,5 +10,5 @@ The repository is organized as follows on the `main` branch.
 - `manifests` - manifests that are manually applied to the cluster during the demonstration
 - `terraform` - Terraform code to provision AKS and EKS clusters and bootstrap Flux/GitOps toolkit
 
-Besides this the branch (devops-team)[https://github.com/neticdk/goto-oaas-demo/tree/devops-team] simulates
+Besides this the branch [devops-team](https://github.com/neticdk/goto-oaas-demo/tree/devops-team) simulates
 a development team or devops team deploying to a namespace inside of a Kubernetes cluster.

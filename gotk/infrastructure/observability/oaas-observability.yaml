@@ -104,6 +104,7 @@ spec:
 
     grafana:
       enabled: true
+      adminPassword: Goto2021!
 
     otel-operator:
       enabled: true

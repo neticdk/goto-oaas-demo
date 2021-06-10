@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: hotrod
-          image: jaegertracing/example-hotrod:latest
+          image: jaegertracing/example-hotrod@sha256:ea65a21793691c0e76f7fa681514a5c35032711555677a54e7ff1274bd3717cb
           imagePullPolicy: Always
           args:
             - all

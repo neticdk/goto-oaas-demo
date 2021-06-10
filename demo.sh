@@ -37,6 +37,7 @@ function deploy_basic() {
 function deploy_observable() {
   echo Deploying hotrod with observability
   kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/otel
+  kubectl --kubeconfig terraform/azure-aks/kube_config.yaml label ns default netic.dk/monitoring=true
   sleep 5
   kubectl --kubeconfig terraform/azure-aks/kube_config.yaml apply -k manifests/app/observable
 }

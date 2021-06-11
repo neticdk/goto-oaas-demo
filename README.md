@@ -12,3 +12,7 @@ The repository is organized as follows on the `main` branch.
 
 Besides this the branch [devops-team](https://github.com/neticdk/goto-oaas-demo/tree/devops-team) simulates
 a development team or devops team deploying to a namespace inside of a Kubernetes cluster.
+
+You might also be interested in:
+ - [Netic OaaS Observability](https://github.com/neticdk/k8s-oaas-observability)
+ - [Netic OaaS Secure Namespace](https://github.com/neticdk/k8s-oaas-sccd)

@@ -61,3 +61,61 @@ spec:
     kind: GitRepository
     name: flux-system
   validation: none
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: observability
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/infrastructure/observability
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: oaas-observability-prometheus-operator
+      namespace: netic-observability-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: oaas-observability-otel-operator-ctrl-mgr
+      namespace: netic-observability-system
+  validation: none
+  postBuild:
+    substitute:
+      cluster_name: "azure-aks"
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: releases
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/clusters/azure-aks/releases
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: none
+  dependsOn:
+    - name: observability
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: namespaces
+  namespace: netic-gitops-system
+spec:
+  interval: 5m0s
+  path: ./gotk/clusters/azure-aks/namespaces
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  validation: none
+  dependsOn:
+    - name: observability

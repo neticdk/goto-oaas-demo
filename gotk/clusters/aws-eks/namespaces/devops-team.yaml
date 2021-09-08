@@ -1,0 +1,139 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: netic-hotrod-app
+  labels:
+    name: netic-hotrod-app
+    netic.dk/monitoring: "true"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: devops-team-key
+  namespace: netic-hotrod-app
+type: Opaque
+data:
+  identity: LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUFNd0FBQUF0emMyZ3RaVwpReU5UVXhPUUFBQUNCVUVHSjVDT2Y4RFBpQlorWHZRTENZVWRRMDZtMy96OGg0QXBEaDBla2RBQUFBQUpEc0VDOVk3QkF2CldBQUFBQXR6YzJndFpXUXlOVFV4T1FBQUFDQlVFR0o1Q09mOERQaUJaK1h2UUxDWVVkUTA2bTMvejhoNEFwRGgwZWtkQUEKQUFBRUQ1Mkt4T2djTXBGZHJOcTEwRklKc0hmYzB5eVBkamZOc0x0Q1BkQWc5dlZGUVFZbmtJNS93TStJRm41ZTlBc0poUgoxRFRxYmYvUHlIZ0NrT0hSNlIwQUFBQUFESFJoYkVCdVpYUnBZeTVrYXdFPQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0K
+  identity.pub: c3NoLWVkMjU1MTkgQUFBQUMzTnphQzFsWkRJMU5URTVBQUFBSUZRUVlua0k1L3dNK0lGbjVlOUFzSmhSMURUcWJmL1B5SGdDa09IUjZSMEEgdGFsQG5ldGljLmRrCg==
+  known_hosts: Z2l0aHViLmNvbSBzc2gtcnNhIEFBQUFCM056YUMxeWMyRUFBQUFCSXdBQUFRRUFxMkE3aFJHbWRubTl0VURiTzlJRFN3Qks2VGJRYStQWFlQQ1B5NnJiVHJUdHc3UEhrY2NLcnBwMHlWaHA1SGRFSWNLcjZwTGxWREJmT0xYOVFVc3lDT1Ywd3pmaklKTmxHRVlzZGxMSml6SGhibjJtVWp2U0FIUXFaRVRZUDgxZUZ6TFFOblBIdDRFVlZVaDdWZkRFU1U4NEtlem1ENVFsV3BYTG12VTMxL3lNZitTZTh4aEhUdktTQ1pJRkltV3dvRzZtYlVvV2Y5bnpwSW9hU2pCK3dlcXFVVW1wYWFhc1hWYWw3MkorVVgyQisyUlBXM1JjVDBlT3pRZ3FsSkwzUktyVEp2ZHNqRTNKRUF2R3EzbEdIU1pYeTI4RzNza3VhMlNtVmkvdzR5Q0U2Z2JPRHFuVFdsZzcrd0M2MDR5ZEdYQThWSmlTNWFwNDNKWGlVRkZBYVE9PQo=
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: netic-hotrod-app-namespace
+  namespace: netic-security-system
+spec:
+  chart:
+    spec:
+      chart: oaas-namespace
+      version: "2.0.1"
+      sourceRef:
+        kind: HelmRepository
+        name: netic-sccd
+        namespace: netic-gitops-system
+      interval: 2m
+
+  targetNamespace: netic-hotrod-app
+  releaseName: bootstrap-hotrod-app
+  interval: 2m
+
+  values:
+    createServiceAccount: true
+    networkPolicyEnabled: true
+    networkPolicies:
+      - name: contour-ingress
+        spec:
+          podSelector:
+            matchLabels:
+              netic.dk/network-ingress: contour
+          policyTypes:
+            - Ingress
+          ingress:
+            - from:  # Contour ingress controller
+              - namespaceSelector:
+                  matchLabels:
+                    name: netic-ingress-system
+              ports:
+                - protocol: TCP
+                  port: http
+      - name: default-egress
+        spec:
+          podSelector: {}
+          policyTypes:
+            - Egress
+          egress:
+            - ports:
+                - protocol: TCP
+                  port: 53
+                - protocol: UDP
+                  port: 53
+                - protocol: TCP
+                  port: 443
+    limitRange:
+      spec:
+        limits:
+          - default:
+              cpu: 100m
+              memory: 128Mi
+            defaultRequest:
+              cpu: 100m
+              memory: 128Mi
+            type: Container
+    resourceQuota:
+      spec:
+        hard:
+          requests.cpu: "2"
+          requests.memory: "2Gi"
+          requests.storage: "0Gi"
+          limits.cpu: "2"
+          limits.memory: "2Gi"
+          persistentvolumeclaims: "0"
+    git:
+      interval: 1m
+      url: ssh://git@github.com/neticdk/goto-oaas-demo.git
+      ref:
+        branch: devops-team
+      secretRef:
+        name: devops-team-key
+    kustomize:
+      interval: 1m
+      path: azure-aks/hotrod
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: netic-hotrod-app
+spec:
+  mode: sidecar
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+      jaeger:
+        protocols:
+          grpc:
+          thrift_compact:
+
+    processors:
+      batch:
+      resource:
+        attributes:
+        - key: cluster
+          value: "azure-aks"
+          action: upsert
+
+    exporters:
+      otlphttp:
+        endpoint: https://goto.netic.dk/otel
+        insecure_skip_verify: true
+      logging:
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp, jaeger]
+          processors: [batch,resource]
+          exporters: [logging, otlphttp]

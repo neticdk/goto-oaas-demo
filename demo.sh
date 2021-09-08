@@ -5,8 +5,8 @@ script_dir=$(dirname $0)
 pushd $script_dir
 
 function commit_and_push() {
-  git add gotk/clusters/$2/bootstrap/sync.yaml
-  git commit -m "chore: $1"
+  git add gotk/clusters/$1/bootstrap/sync.yaml
+  git commit -m "chore: $2"
   git push
 }
 
@@ -47,39 +47,37 @@ function remove_app() {
   kubectl --kubeconfig terraform/$1/kube_config.yaml delete -k manifests/app/observable
 }
 
-while [[ $# -gt 0 ]]; do
-  key="$1"
+key="$1"
 
-  case $key in
-    cleanup)
-    shift
-    cleanup $1
-    ;;
-    observable)
-    shift
-    observable $1
-    ;;
-    namespace)
-    shift
-    namespace $1
-    ;;
-    app_basic)
-    shift
-    deploy_basic $1
-    ;;
-    app_observable)
-    shift
-    deploy_observable $1
-    ;;
-    app_remove)
-    shift
-    remove_app $1
-    ;;
-    *)
-    echo Unknown argument: $key
-    shift
-    ;;
-  esac
-done
+case $key in
+  cleanup)
+  shift
+  cleanup $1
+  ;;
+  observable)
+  shift
+  observable $1
+  ;;
+  namespace)
+  shift
+  namespace $1
+  ;;
+  app_basic)
+  shift
+  deploy_basic $1
+  ;;
+  app_observable)
+  shift
+  deploy_observable $1
+  ;;
+  app_remove)
+  shift
+  remove_app $1
+  ;;
+  *)
+  echo Unknown argument: $key
+  shift
+  ;;
+esac
 
 popd
